@@ -101,7 +101,7 @@ public class BeerEndpoint{
             beerResponse = new Beer();
             beerResponse.setName("El Id de la cerveza no existe");
             return HttpResponse
-                    .ok(beerResponse)
+                    .notFound(beerResponse)
                     .headers(headers -> headers.location(location(beerID)));
         }
 
