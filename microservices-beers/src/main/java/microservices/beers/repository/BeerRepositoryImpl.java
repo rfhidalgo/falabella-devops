@@ -33,7 +33,7 @@ public class BeerRepositoryImpl implements BeerRepository {
 
     @Override
     @Transactional
-    public Beer addBeers(@NotNull Beer newBeer) throws Exception {
+    public Beer addBeers(@NotNull Beer newBeer){
         Beer beer = newBeer;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Tracing BeerRepositoryImpl:addBeers:" + newBeer);
@@ -43,10 +43,10 @@ public class BeerRepositoryImpl implements BeerRepository {
             entityManager.persist(beer);
 
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             LOG.error("Ha ocurrido un error interno BeerRepositoryImpl:addBeers:" + e.getMessage());
-            throw new Exception(e);
+            throw e;
         }
 
         return beer;
@@ -54,7 +54,7 @@ public class BeerRepositoryImpl implements BeerRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Beer> searchBeers(SortingAndOrderArguments args)  throws Exception {
+    public List<Beer> searchBeers(SortingAndOrderArguments args)  {
         String qlString = "SELECT g FROM Beer g";
 
         if (LOG.isDebugEnabled()) {
@@ -76,17 +76,17 @@ public class BeerRepositoryImpl implements BeerRepository {
 
             return query.getResultList();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             LOG.error("Ha ocurrido un error interno BeerRepositoryImpl:searchBeers(args):" + e.getMessage());
-            throw new Exception(e);
+            throw e;
         }
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public List<Beer> searchBeers() throws Exception {
+    public List<Beer> searchBeers() {
         String qlString = "SELECT g FROM Beer g";
 
         if (LOG.isDebugEnabled()) {
@@ -98,46 +98,29 @@ public class BeerRepositoryImpl implements BeerRepository {
             TypedQuery<Beer> query = entityManager.createQuery(qlString, Beer.class);
             return query.getResultList();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             LOG.error("Ha ocurrido un error interno BeerRepositoryImpl:searchBeers:" + e.getMessage());
-            throw new Exception(e);
+            throw e;
         }
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Beer searchBeerById(Integer beerID) throws BeerServiceException {
+    public Beer searchBeerById(Integer beerID) {
         Beer beer = null;
-        String qlString = "SELECT g FROM Beer g" + " where g.id=" + beerID;
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Tracing BeerRepositoryImpl:searchBeerById:" + beerID );
         }
 
-        try {
+        beer = entityManager.find(Beer.class, beerID);
 
-            TypedQuery<Beer> query = entityManager.createQuery(qlString, Beer.class);
-
-
-            if (query.getResultList().isEmpty()) {
-
-                throw new BeerNotFoundException();
-            }
-            else
-            {
-                beer = query.getResultList().get(0);
-            }
-
-
+        if (beer == null) {
+            throw new BeerNotFoundException();
         }
 
-        catch (BeerServiceException e)
-        {
-            LOG.error("Ha ocurrido un error interno BeerRepositoryImpl:searchBeerById:" + e.getMessage());
-            throw new BeerServiceException();
-        }
 
         return beer;
 

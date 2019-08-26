@@ -14,6 +14,6 @@ public class BeerNotFoundExceptionHandler implements ExceptionHandler<BeerNotFou
 
     @Override
     public HttpResponse handle(HttpRequest request, BeerNotFoundException exception) {
-        return HttpResponse.ok(0);
+        return HttpResponse.notFound();
     }
 }

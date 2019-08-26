@@ -1,4 +1,4 @@
 package microservices.beers;
 
-public class BeerNotFoundException extends RuntimeException {
+public class BeerNotFoundException extends BeerServiceException {
 }

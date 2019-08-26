@@ -37,14 +37,14 @@ public class BeerServiceImpl implements BeerService {
             LOG.debug("Tracing addBeers:" + beer);
         }
         try {
-           // if (bearRepository.searchBeerById(beer.getId()) == null) {
+           // if (bearRepository.searchBeerById(beer.getId()) == null)
 
                 newBeer = bearRepository.addBeers(beer);
             //}
 
         } catch (Exception e) {
             LOG.error("Ha ocurrido un error interno BeerServiceImpl:addBeers:" + e.getMessage());
-            throw new Exception(e);
+            throw e;
         }
         return newBeer;
     }
