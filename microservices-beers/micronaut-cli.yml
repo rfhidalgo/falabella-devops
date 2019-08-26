@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: microservices.beers
+---
+testFramework: junit
+sourceLanguage: java
