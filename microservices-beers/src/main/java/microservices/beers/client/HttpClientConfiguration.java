@@ -13,7 +13,7 @@ public class HttpClientConfiguration {
     public static final String PREFIX = "bintray";
     public static final String BASE_URL = "http://apilayer.net/api/";
     public static final String ENDPOINT = "live";
-    public static final String ACCESS_KEY = "62b83115299353bef3b1e62134e261d7";
+    public static final String ACCESS_KEY = "4c93b425dfbbaf8a1b58068a1f4e13f2";
     public static final String MONEY_SOURCE = "USD";
 
     private String apiversion;

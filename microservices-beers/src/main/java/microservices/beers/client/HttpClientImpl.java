@@ -23,18 +23,18 @@ public class HttpClientImpl {
         uri = UriTemplate.of(path).expand(configuration.toMap());
     }
 
-   public HttpClientApiLayerEntity getCuotesByCurrencies(String currencies) {
+   public HttpClientApiLayerEntity getCuotesByCurrencies(String currencies) { //Gratis pero limitado
         HttpRequest<?> req = HttpRequest.GET(uri+"&currencies="+currencies);
         return (HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
     }
 
-    public HttpClientApiLayerEntity  getCuotesFromCurrenciesSource(String source) {
+    public HttpClientApiLayerEntity  getCuotesFromCurrenciesSource(String source) { //Pagado
         HttpRequest<?> req = HttpRequest.GET(uri+"&source="+source);
         return (HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
 
     }
 
-    public HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount) {
+    public HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount) { //Pagado
         HttpRequest<?> req = HttpRequest.GET(uri+"&from"+HttpClientConfiguration.MONEY_SOURCE +"&to="+currencies+"&amount="+amount);
         return(HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
 

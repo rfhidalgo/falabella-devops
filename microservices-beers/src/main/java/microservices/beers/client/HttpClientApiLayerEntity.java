@@ -9,8 +9,8 @@ public class HttpClientApiLayerEntity {
     String privacy;
     Long timestamp;
     String source;
+    Map<String, Object> error;
     Map<String, Object> quotes;
-
 
     public boolean isSuccess() {
         return success;
@@ -50,6 +50,14 @@ public class HttpClientApiLayerEntity {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Map<String, Object> getError() {
+        return error;
+    }
+
+    public void setError(Map<String, Object> error) {
+        this.error = error;
     }
 
     public Map<String, Object> getQuotes() {

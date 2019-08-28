@@ -5,6 +5,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "beer")
@@ -13,17 +14,32 @@ public class Beer {
     public Beer() {
     }
 
+
     public Beer(@NotNull Integer id, BeerBox bearBox) {
         this.id = id;
         this.beerBox = bearBox;
     }
 
     @Id
+    @NotNull
     private Integer id;
+
+    @NotNull
+    @Size(min=1, max=150)
     private String name;
+
+    @NotNull
+    @Size(min=1, max=250)
     private String brewery;
+
+    @NotNull
+    @Size(min=1, max=50)
     private String country;
+
+    @NotNull
     private Number price;
+
+    @NotNull
     private String currency;
 
     @ManyToOne

@@ -5,8 +5,7 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 @ConfigurationProperties("application")
 public class ApplicationConfigurationProperties implements ApplicationConfiguration {
 
-
-    private final Integer DEFAULT_MAX = 10;
+    private static final Integer DEFAULT_MAX = 10;
 
     private Integer max = DEFAULT_MAX;
 

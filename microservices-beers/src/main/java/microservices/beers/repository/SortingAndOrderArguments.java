@@ -23,10 +23,10 @@ public class SortingAndOrderArguments {
     @Nullable
     private String order;
 
-    //TODO: hacer llamado a constructor super()
-    public SortingAndOrderArguments() {
 
-    }
+    public SortingAndOrderArguments() {
+        super();
+  }
 
     public Optional<Integer> getOffset() {
         if(offset == null) {
@@ -51,11 +51,7 @@ public class SortingAndOrderArguments {
     }
 
     public Optional<String> getSort() {
-        //TODO: utilizar Optional.ofNullable en lugar de escribir todo ese codigo
-        if(sort == null) {
-            return Optional.empty();
-        }
-        return Optional.of(sort);
+           return Optional.ofNullable(sort);
     }
 
     public void setSort(@Nullable String sort) {

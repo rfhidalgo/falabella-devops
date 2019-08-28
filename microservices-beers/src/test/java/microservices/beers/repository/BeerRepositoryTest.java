@@ -2,18 +2,28 @@ package microservices.beers.repository;
 
 import io.micronaut.test.annotation.MicronautTest;
 import microservices.beers.entity.Beer;
+import microservices.beers.exeption.BeerAlreadyExistsException;
+import microservices.beers.exeption.BeerNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /*
-* TODO: Agregar tests que validen la logica del componente, estos agregan mas valor.
-* EJ: Agregar un test que verifique que se lanzo una excepcion si no se encontraron cervezas
-* para un criterio de busqueda especifico
-* Validar tambien casos negativos, en caso de errores como inserts o updates fallidos.
+ *  Casos de Test:
+ *   shouldAddBeers - Esperar un Objeto Beer la Cerveza creada
+ *   shouldAddBeersAlreadyExists - Esperar una exepcion BeerAlreadyExistsException(409) con el mensaje: "El ID de la cerveza ya existe:{N°ID}"
+ *   shouldSearchBeersPopulate - Esperar una lista<Beer> de las cervezas agregadas anteriormente
+ *   shouldSearchBeerByIdNotExist - Esperar una exepción BeerNotFoundException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
+ *   shouldSearchBeerByIExist - Esperar un objeto Beer con la cerveza buscada
+ *
  */
+
 
 @MicronautTest
 class BeerRepositoryTest {
@@ -22,29 +32,37 @@ class BeerRepositoryTest {
     BeerRepository beerRepository;
 
     @Test
-    void addBeers() throws Exception {
-
-        /*Ingresa una nueva cerveza*/
+    void shouldAddBeers() {
 
         Beer beer = new Beer();
-        //TODO: remover variables no utilizadas
-        Beer newBeer = new Beer();
         beer.setId(300);
         beer.setName("Golden");
         beer.setBrewery("Kross");
         beer.setCountry("Chile");
         beer.setCurrency("EUR");
         beer.setPrice(15.5);
-
-       /* Assertions.assertEquals(beer, beerRepository.addBeers(beer));*/
-
-
+        assertEquals(beer, beerRepository.addBeers(beer));
     }
 
-    @Test
-    void searchBeers() throws Exception {
 
-        /*Listar todas las cervezas ()*/
+    @Test
+    void shouldAddBeersAlreadyExists() {
+
+        Beer beer = new Beer();
+        beer.setId(300);
+        beer.setName("Golden");
+        beer.setBrewery("Kross");
+        beer.setCountry("Chile");
+        beer.setCurrency("EUR");
+        beer.setPrice(15.5);
+        assertEquals(beer, beerRepository.addBeers(beer));
+        BeerAlreadyExistsException beerAlreadyExistsException = assertThrows(BeerAlreadyExistsException.class, () -> beerRepository.addBeers(beer));
+    }
+
+
+    @Test
+    void shouldSearchBeersPopulate() {
+
         List<Beer> searchBeers = null;
         Beer beer = new Beer();
         beer.setId(900);
@@ -54,34 +72,21 @@ class BeerRepositoryTest {
         beer.setCurrency("CLP");
         beer.setPrice(7.5);
         beerRepository.addBeers(beer); //Se agrega cerveza
-
-        searchBeers = new ArrayList<>();
-
-        /*Se valida que no venga la lista vacia*/
-      /* Assertions.assertNotEquals(searchBeers,
-                beerRepository.searchBeers(null)
-
-        );*/
-
-
+        Assertions.assertNotEquals(new ArrayList<>(),
+                beerRepository.searchBeers()
+        );
     }
 
     @Test
-    void searchBeerById() throws Exception {
+    void shouldSearchBeerByIdNotExist() {
+        BeerNotFoundException beerNotFoundException = assertThrows(BeerNotFoundException.class, () -> beerRepository.searchBeerById(2000));
+        assertEquals("El Id de la cerveza no existe:" + 2000, beerNotFoundException.getMessage());
+    }
 
 
-        /*Buscar una cerveza que no existe*/
+    @Test
+    void shouldSearchBeerByIExist() {
 
-        Beer searchBeerById = null;
-        //TODO: remover asignacion no utilizada
-        searchBeerById = new Beer();
-       // searchBeerById = beerRepository.searchBeerById(212);
-
-        /*Assertions.assertEquals(null,
-                searchBeerById
-        );*/
-
-        /*Buscar una cerveza que existe*/
         Beer beer = new Beer();
         beer.setId(333);
         beer.setName("Foreign Extra Stout");
@@ -89,13 +94,11 @@ class BeerRepositoryTest {
         beer.setCountry("Chile");
         beer.setCurrency("CLP");
         beer.setPrice(6.5);
-        //beerRepository.addBeers(beer); //Se agrega cerveza previamente
-
-       // searchBeerById = beerRepository.searchBeerById(beer.getId());
-        /*Assertions.assertEquals(
+        beerRepository.addBeers(beer); //Se agrega cerveza previamente
+        Assertions.assertEquals(
                 beer,
-                searchBeerById
-        );*/
+                beerRepository.searchBeerById(beer.getId())
+        );
 
     }
 }
