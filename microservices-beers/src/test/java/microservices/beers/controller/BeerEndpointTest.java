@@ -8,6 +8,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.annotation.MicronautTest;
+import microservices.beers.client.HttpClient;
 import microservices.beers.client.HttpClientApiLayerEntity;
 import microservices.beers.client.HttpClientImpl;
 import microservices.beers.entity.Beer;
@@ -40,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @MicronautTest
 class BeerEndpointTest {
 
+    private static final double precioTotal = 19.015919999999998;//Actualizar segun valor de conversión del dia (3.5 * 6 * USDEUR)
+
     @Inject
     ApplicationContext contex;
 
@@ -48,7 +51,7 @@ class BeerEndpointTest {
     BeerEndpoint beerEndpoint;
 
     @Inject
-    HttpClientImpl httpClientImpl;
+    HttpClient httpClient;
 
 
     @Inject
@@ -93,9 +96,8 @@ class BeerEndpointTest {
     void shouldAddBeersBadRequest() {
 
         Beer beer = new Beer();
-        beer.setId(221);
+        beer.setId(229);
         beer.setName("");
-        beer.setBrewery("");
         beer.setCountry("");
         beer.setCurrency("EUR");
         beer.setPrice(15.5);
@@ -207,8 +209,8 @@ class BeerEndpointTest {
         HttpRequest request = HttpRequest.POST("/", beer);
         Beer bodyResponseAddBeers = (Beer) client.toBlocking().retrieve(request, Beer.class); //Se agrega cerveza
 
-        Number precioTotal = 18.933558;
-        HttpClientApiLayerEntity apiLayerEntity = httpClientImpl.getCuotesByCurrencies("EUR");
+
+        HttpClientApiLayerEntity apiLayerEntity = httpClient.getCuotesByCurrencies("EUR");
         if (apiLayerEntity.isSuccess()) {
             request = HttpRequest.GET("/" + beer.getId() + "/boxprice");
             BeerBox boxBeerPriceById = (BeerBox) client.toBlocking().retrieve(request, BeerBox.class);
@@ -235,9 +237,9 @@ class BeerEndpointTest {
         beer.setPrice(3.5);
         HttpRequest request = HttpRequest.POST("/", beer);
         Beer bodyResponseAddBeers = (Beer) client.toBlocking().retrieve(request, Beer.class); //Se agrega cerveza
-        HttpClientApiLayerEntity apiLayerEntity = httpClientImpl.getCuotesByCurrencies("EUR");
+        HttpClientApiLayerEntity apiLayerEntity = httpClient.getCuotesByCurrencies("EUR");
 
-        if (apiLayerEntity.isSuccess()==false) {
+        if (!apiLayerEntity.isSuccess()) {
             request = HttpRequest.GET("/" + beer.getId() + "/boxprice");
             HttpRequest finalRequest = request;
             HttpClientResponseException httpClientResponseException = Assertions.assertThrows(HttpClientResponseException.class, ()->client.toBlocking().retrieve(finalRequest, HttpClientResponseException.class));

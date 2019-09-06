@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton
-public class HttpClientImpl {
+public class HttpClientImpl implements HttpClient{
 
 
     private final RxHttpClient httpClient;
@@ -23,18 +23,22 @@ public class HttpClientImpl {
         uri = UriTemplate.of(path).expand(configuration.toMap());
     }
 
-   public HttpClientApiLayerEntity getCuotesByCurrencies(String currencies) { //Gratis pero limitado
+   @Override
+   public HttpClientApiLayerEntity getCuotesByCurrencies(String currencies) { //Obtiene todas las tasas de cambio para una moneda en particular
         HttpRequest<?> req = HttpRequest.GET(uri+"&currencies="+currencies);
         return (HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
     }
 
-    public HttpClientApiLayerEntity  getCuotesFromCurrenciesSource(String source) { //Pagado
+
+    @Override
+    public HttpClientApiLayerEntity  getCuotesFromCurrenciesSource(String source) { //Obtiene todas las tasas de cambio de una moneda de origen en particular
         HttpRequest<?> req = HttpRequest.GET(uri+"&source="+source);
         return (HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
 
     }
 
-    public HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount) { //Pagado
+    @Override
+    public HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount) { //Obtiene la conversión de una moneda de origen a una moneda destino y en base al monto de conversión
         HttpRequest<?> req = HttpRequest.GET(uri+"&from"+HttpClientConfiguration.MONEY_SOURCE +"&to="+currencies+"&amount="+amount);
         return(HttpClientApiLayerEntity) httpClient.retrieve(req, Argument.of(List.class, HttpClientApiLayerEntity.class)).blockingSingle().get(0);
 

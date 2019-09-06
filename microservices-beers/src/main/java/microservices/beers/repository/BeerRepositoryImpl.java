@@ -4,8 +4,8 @@ import io.micronaut.configuration.hibernate.jpa.scope.CurrentSession;
 import io.micronaut.spring.tx.annotation.Transactional;
 import microservices.beers.ApplicationConfiguration;
 import microservices.beers.entity.Beer;
-import microservices.beers.exeption.BeerAlreadyExistsException;
-import microservices.beers.exeption.BeerNotFoundException;
+import microservices.beers.exeption.BeerException;
+import microservices.beers.exeption.BeerStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +40,10 @@ public class BeerRepositoryImpl implements BeerRepository {
             LOG.debug("Tracing BeerRepositoryImpl:addBeers: {}", newBeer);
         }
         beer = entityManager.find(Beer.class, newBeer.getId());
-        if (beer == null) {
-            entityManager.persist(newBeer);
-        } else {
-            throw new BeerAlreadyExistsException("El ID de la cerveza ya existe:" + newBeer.getId());
+        if (beer != null) {
+            throw new BeerException(BeerStatusException.CONFLICT, "El ID de la cerveza ya existe:" + newBeer.getId(),"/beers");
         }
+        entityManager.persist(newBeer);
         return newBeer;
     }
 
@@ -89,7 +88,7 @@ public class BeerRepositoryImpl implements BeerRepository {
         }
         beer = entityManager.find(Beer.class, beerID);
         if (beer == null) {
-            throw new BeerNotFoundException("El Id de la cerveza no existe:" + beerID, beerID);
+            throw new BeerException(BeerStatusException.NOT_FOUND, "El Id de la cerveza no existe:" + beerID, "/beers/" + beerID);
         }
         return beer;
     }

@@ -4,9 +4,7 @@ import io.micronaut.test.annotation.MicronautTest;
 import microservices.beers.client.HttpClientApiLayerEntity;
 import microservices.beers.client.HttpClientImpl;
 import microservices.beers.entity.Beer;
-import microservices.beers.exeption.BeerAlreadyExistsException;
-import microservices.beers.exeption.BeerApiLayerNotAvailableException;
-import microservices.beers.exeption.BeerNotFoundException;
+import microservices.beers.exeption.BeerException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /*
  *  Casos de Test:
  *   shouldAddBeers - Esperar un Objeto Beer la Cerveza creada
- *   shouldAddBeersAlreadyExists - Esperar una exepcion BeerAlreadyExistsException(409) con el mensaje: "El ID de la cerveza ya existe:{N°ID}"
+ *   shouldAddBeersAlreadyExists - Esperar una exepcion BeerException(409) con el mensaje: "El ID de la cerveza ya existe:{N°ID}"
  *   shouldSearchBeersPopulate - Esperar una lista<Beer> de las cervezas agregadas anteriormente
- *   shouldSearchBeerByIdNotExist - Esperar una exepción BeerNotFoundException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
+ *   shouldSearchBeerByIdNotExist - Esperar una exepción BeerException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
  *   shouldSearchBeerByIExist - Esperar un objeto Beer con la cerveza buscada
- *   shouldBoxBeerPriceByIddNotExist - Esperar una exepción BeerNotFoundException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
+ *   shouldBoxBeerPriceByIddNotExist - Esperar una exepción BeerException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
  *   shouldBoxBeerPriceByExist - Esperar un objeto BeerBox con el precio de la caja de la cerveza consultada
- *   shouldBoxBeerPriceByExistApiNoAvailable - Esperar una BeerApiLayerNotAvailableException(503)  con el mensaje: Servicio apilayer no disponible https://currencylayer.com:{error:{code:info}}
+ *   shouldBoxBeerPriceByExistApiNoAvailable - Esperar una BeerException(503)  con el mensaje: Servicio apilayer no disponible: {error:{code:info}}
  */
 
 
@@ -62,7 +60,7 @@ class BeerServiceTest {
         newBeer.setCurrency("EUR");
         newBeer.setPrice(15.5);
         beerService.addBeers(newBeer);
-        BeerAlreadyExistsException beerAlreadyExistsException = assertThrows(BeerAlreadyExistsException.class, () -> beerService.addBeers(newBeer));
+        BeerException beerAlreadyExistsException = assertThrows(BeerException.class, () -> beerService.addBeers(newBeer));
         Assertions.assertEquals("El ID de la cerveza ya existe:" + newBeer.getId(), beerAlreadyExistsException.getMessage());
     }
 
@@ -85,7 +83,7 @@ class BeerServiceTest {
     @Test
     void shouldSearchBeerByIdNotExist() {
 
-        BeerNotFoundException beerNotFoundException = assertThrows(BeerNotFoundException.class, () -> beerService.searchBeerById(2000));
+        BeerException beerNotFoundException = assertThrows(BeerException.class, () -> beerService.searchBeerById(2000));
         assertEquals("El Id de la cerveza no existe:" + 2000, beerNotFoundException.getMessage());
 
     }
@@ -108,7 +106,7 @@ class BeerServiceTest {
     @Test
     void shouldBoxBeerPriceByIddNotExist()  {
 
-       BeerNotFoundException beerNotFoundException = assertThrows(BeerNotFoundException.class, () -> beerService.boxBeerPriceById(2000));
+        BeerException beerNotFoundException = assertThrows(BeerException.class, () -> beerService.boxBeerPriceById(2000));
        assertEquals("El Id de la cerveza no existe:" + 2000, beerNotFoundException.getMessage());
     }
 
@@ -152,10 +150,10 @@ class BeerServiceTest {
         beerService.addBeers(beer); //Se agrega cerveza previamente
 
         HttpClientApiLayerEntity apiLayerEntity = httpClientImpl.getCuotesByCurrencies("EUR");
-        if (apiLayerEntity.isSuccess()==false) {
+        if (!apiLayerEntity.isSuccess()) {
 
-            BeerApiLayerNotAvailableException beerApiLayerNotAvailableException = assertThrows(BeerApiLayerNotAvailableException.class, () -> beerService.boxBeerPriceById(4));
-            assertEquals("Servicio apilayer no disponible https://currencylayer.com: {code=104, info=Your monthly usage limit has been reached. Please upgrade your Subscription Plan.}", beerApiLayerNotAvailableException.getMessage());
+            BeerException beerApiLayerNotAvailableException = assertThrows(BeerException.class, () -> beerService.boxBeerPriceById(4));
+            assertEquals("Servicio apilayer no disponible: {code=101, type=invalid_access_key, info=You have not supplied a valid API Access Key. [Technical Support: support@apilayer.com]}", beerApiLayerNotAvailableException.getMessage());
         }
     }
 

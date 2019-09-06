@@ -2,8 +2,7 @@ package microservices.beers.repository;
 
 import io.micronaut.test.annotation.MicronautTest;
 import microservices.beers.entity.Beer;
-import microservices.beers.exeption.BeerAlreadyExistsException;
-import microservices.beers.exeption.BeerNotFoundException;
+import microservices.beers.exeption.BeerException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /*
  *  Casos de Test:
  *   shouldAddBeers - Esperar un Objeto Beer la Cerveza creada
- *   shouldAddBeersAlreadyExists - Esperar una exepcion BeerAlreadyExistsException(409) con el mensaje: "El ID de la cerveza ya existe:{N°ID}"
+ *   shouldAddBeersAlreadyExists - Esperar una exepcion BeerException(409) con el mensaje: "El ID de la cerveza ya existe:{N°ID}"
  *   shouldSearchBeersPopulate - Esperar una lista<Beer> de las cervezas agregadas anteriormente
- *   shouldSearchBeerByIdNotExist - Esperar una exepción BeerNotFoundException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
+ *   shouldSearchBeerByIdNotExist - Esperar una exepción BeerException(404) con el mensaje: "El Id de la cerveza no existe:{N°ID}"
  *   shouldSearchBeerByIExist - Esperar un objeto Beer con la cerveza buscada
  *
  */
@@ -56,7 +55,7 @@ class BeerRepositoryTest {
         beer.setCurrency("EUR");
         beer.setPrice(15.5);
         assertEquals(beer, beerRepository.addBeers(beer));
-        BeerAlreadyExistsException beerAlreadyExistsException = assertThrows(BeerAlreadyExistsException.class, () -> beerRepository.addBeers(beer));
+        BeerException beerAlreadyExistsException = assertThrows(BeerException.class, () -> beerRepository.addBeers(beer));
     }
 
 
@@ -79,7 +78,7 @@ class BeerRepositoryTest {
 
     @Test
     void shouldSearchBeerByIdNotExist() {
-        BeerNotFoundException beerNotFoundException = assertThrows(BeerNotFoundException.class, () -> beerRepository.searchBeerById(2000));
+        BeerException beerNotFoundException = assertThrows(BeerException.class, () -> beerRepository.searchBeerById(2000));
         assertEquals("El Id de la cerveza no existe:" + 2000, beerNotFoundException.getMessage());
     }
 

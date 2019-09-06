@@ -1,11 +1,12 @@
 package microservices.beers.service;
 
 import io.micronaut.validation.validator.Validator;
+import microservices.beers.client.HttpClient;
 import microservices.beers.client.HttpClientApiLayerEntity;
-import microservices.beers.client.HttpClientImpl;
 import microservices.beers.entity.Beer;
 import microservices.beers.entity.BeerBox;
-import microservices.beers.exeption.BeerApiLayerNotAvailableException;
+import microservices.beers.exeption.BeerException;
+import microservices.beers.exeption.BeerStatusException;
 import microservices.beers.repository.BeerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,13 @@ public class BeerServiceImpl implements BeerService {
 
 
     private final BeerRepository bearRepository;
-    private final HttpClientImpl httpClientImpl;
+    private final HttpClient httpClient;
     private Validator validator;
     private static final Logger LOG = LoggerFactory.getLogger(BeerServiceImpl.class);
 
-    public BeerServiceImpl(BeerRepository bearRepository, HttpClientImpl httpClientImpl) {
+    public BeerServiceImpl(BeerRepository bearRepository, HttpClient httpClient) {
         this.bearRepository = bearRepository;
-        this.httpClientImpl = httpClientImpl;
+        this.httpClient = httpClient;
 
     }
 
@@ -67,20 +68,18 @@ public class BeerServiceImpl implements BeerService {
             LOG.debug("Tracing boxBeerPriceById beerID: {}", beerID);
         }
         beer = bearRepository.searchBeerById(beerID);
-        clientApiLayerEntity = httpClientImpl.getCuotesByCurrencies(beer.getCurrency());
-        if (clientApiLayerEntity.isSuccess()) {
-            beerBox = new BeerBox();
-            Map<String, Object> quotes = clientApiLayerEntity.getQuotes();
-            double changeMoney = (Double) quotes.get(clientApiLayerEntity.getSource() + beer.getCurrency());
-            double priceTotal = changeMoney * beerBox.getNumberPackage().doubleValue() * beer.getPrice().doubleValue();
-            beerBox = new BeerBox();
-            beerBox.setPriceTotal(priceTotal);
-            beerBox.setBeer(Collections.singleton(beer));
-            beerBox.setName(beer.getName());
-        } else {
-            throw new BeerApiLayerNotAvailableException("Servicio apilayer no disponible https://currencylayer.com: "+clientApiLayerEntity.getError().toString());
+        clientApiLayerEntity = httpClient.getCuotesByCurrencies(beer.getCurrency());
+        if (!clientApiLayerEntity.isSuccess()) {
+            throw new BeerException(BeerStatusException.SERVICE_UNAVAILABLE, "Servicio apilayer no disponible: "+clientApiLayerEntity.getError().toString(), "/beers/"+beerID+"/boxprice");
         }
-
+        beerBox = new BeerBox();
+        Map<String, Object> quotes = clientApiLayerEntity.getQuotes();
+        double changeMoney = (Double) quotes.get(clientApiLayerEntity.getSource() + beer.getCurrency());
+        double priceTotal = changeMoney * beerBox.getNumberPackage().doubleValue() * beer.getPrice().doubleValue();
+        beerBox = new BeerBox();
+        beerBox.setPriceTotal(priceTotal);
+        beerBox.setBeer(Collections.singleton(beer));
+        beerBox.setName(beer.getName());
         return beerBox;
     }
 

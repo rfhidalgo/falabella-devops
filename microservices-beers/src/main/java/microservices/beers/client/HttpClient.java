@@ -1,18 +1,9 @@
 package microservices.beers.client;
 
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.client.annotation.Client;
 
-@Client(HttpClientConfiguration.BASE_URL)
 public interface HttpClient {
 
-    @Get
-    HttpClientApiLayerEntity getCuotesByCurrencies(String currencies);
-
-    @Get
-    HttpClientApiLayerEntity getCuotesFromCurrenciesSource();
-
-    @Get
-    HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount);
-
+    HttpClientApiLayerEntity getCuotesByCurrencies(String currencies); //Obtiene todas las tasas de cambio para una moneda en particular
+    HttpClientApiLayerEntity getCuotesFromCurrenciesSource(String source); //Obtiene todas las tasas de cambio de una moneda de origen en particular
+    HttpClientApiLayerEntity getCurrencyConversionFromTo(String currencies,Integer amount);//Obtiene la conversión de una moneda de origen a una moneda destino y en base al monto de conversión
 }
