@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @MicronautTest
 class BeerEndpointTest {
 
-    private static final double precioTotal = 19.015919999999998;//Actualizar segun valor de conversión del dia (3.5 * 6 * USDEUR)
+    private static final double precioTotal = 18.86367;//Actualizar segun valor de conversión del dia (3.5 * 6 * USDEUR)
 
     @Inject
     ApplicationContext contex;

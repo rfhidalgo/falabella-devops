@@ -19,10 +19,11 @@ import java.util.Map;
 @MicronautTest
 class HttpClientTest {
 
-    private static final double moneyExpected = 0.90552;//Actualizar Tasa de cambio USDEUR: http://apilayer.net/api/live?access_key=804f092ad90a19a6c76968d6ab8b4bb3&currencies=EUR
+    private static final double moneyExpected = 0.89827;//Actualizar Tasa de cambio USDEUR: http://apilayer.net/api/live?access_key=804f092ad90a19a6c76968d6ab8b4bb3&currencies=EUR
 
     @Inject
     HttpClient httpClient;
+
 
 
     @Test
